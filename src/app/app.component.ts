@@ -59,7 +59,7 @@ export class AppComponent {
         sideMenuElement = document.createElement('div');
         sideMenuElement.style.background = 'gray';
         sideMenuElement.style.position = 'absolute';
-        sideMenuElement.style.top = '';
+        // sideMenuElement.style.top = '';
         sideMenuElement.style.padding = '5px';
         sideMenuElement.style.opacity = '0.8';
 
@@ -122,18 +122,20 @@ export class AppComponent {
         });
         formattingToolbarElement.appendChild(strikethroughBtn);
         // strike through
-        const changeColorBtn = this.createButton('Color', () => {
-          // editor.toggleStyles({ backgroundColor: 'blue'});
-          const selectedBlock = editor.getSelection();
-          selectedBlock.blocks[0].props.backgroundColor = 'yellow';
-          // selectedBlock.blocks[0].props.textAlignment = 'right';
-          // selectedBlock.blocks[0].content[0].styles.color = 'blue';
-          // console.log(selectedBlock);
-          console.log(selectedBlock.blocks[0].props.backgroundColor);
-          console.log(editor.getActiveStyles());
-          // console.log(editor.getSelectedText());
-        });
-        formattingToolbarElement.appendChild(changeColorBtn);
+        // const changeColorBtn = this.createButton('Color', () => {
+        //   editor.toggleStyles({ textColor: 'yellow' });
+        //   console.log(editor.getActiveStyles());
+        //   const inlineContent = document.querySelector('.bn-inline-content');
+        //   if (inlineContent) {
+        //     const spans = inlineContent.querySelectorAll(
+        //       'span[data-text-color]'
+        //     );
+        //     spans.forEach((span: HTMLElement) => {
+        //       span.style.color = 'yellow';
+        //     });
+        //   }
+        // });
+        // formattingToolbarElement.appendChild(changeColorBtn);
 
         document.getElementById('root')!.appendChild(formattingToolbarElement);
       }
