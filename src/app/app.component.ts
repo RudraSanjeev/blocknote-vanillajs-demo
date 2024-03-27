@@ -43,87 +43,105 @@ export class AppComponent {
 
     return element;
   }
-
   initializeEditor() {
     const editor = BlockNoteEditor.create();
     editor.mount(document.getElementById('root'));
 
-    let element: HTMLElement | null = null; // Declare element variable outside the event handler
-
-    // <-------------sideMenu --------------------->
+    let sideMenuElement: HTMLElement | null = null;
+    let formattingToolbarElement: HTMLElement | null = null;
+    let linkToolbarElement: HTMLElement | null = null;
+    let imageToolbarElement: HTMLElement | null = null;
+    let suggestionMenuElement: HTMLElement | null = null;
+    let tableHandlesElement: HTMLElement | null = null;
+    // Initialize sideMenu
     editor.sideMenu.onUpdate((sideMenuState) => {
-      if (!element) {
-        element = document.createElement('div');
-        element.style.background = 'gray';
-        element.style.position = 'absolute';
-        element.style.top = '';
-        element.style.padding = '5px';
-        element.style.opacity = '0.8';
+      if (!sideMenuElement) {
+        sideMenuElement = document.createElement('div');
+        sideMenuElement.style.background = 'gray';
+        sideMenuElement.style.position = 'absolute';
+        sideMenuElement.style.top = '';
+        sideMenuElement.style.padding = '5px';
+        sideMenuElement.style.opacity = '0.8';
 
+        // Add button for side menu
         const addBtn = this.createButton('+', () => {
           editor.sideMenu.addBlock();
         });
-        element.appendChild(addBtn);
+        sideMenuElement.appendChild(addBtn);
 
+        // Add button for dragging blocks
         const dragBtn = this.createButton('::', () => {});
         dragBtn.addEventListener('dragstart', editor.sideMenu.blockDragStart);
         dragBtn.addEventListener('dragend', editor.sideMenu.blockDragEnd);
         dragBtn.draggable = true;
-        element.style.display = 'none';
-        element.appendChild(dragBtn);
+        sideMenuElement.style.display = 'none';
+        sideMenuElement.appendChild(dragBtn);
 
-        document.getElementById('root')!.appendChild(element);
+        document.getElementById('root')!.appendChild(sideMenuElement);
       }
 
       if (sideMenuState.show) {
-        element.style.display = 'block';
-        element.style.top = sideMenuState.referencePos.top + 'px';
-        element.style.left =
-          sideMenuState.referencePos.x - element.offsetWidth + 'px';
+        sideMenuElement.style.display = 'block';
+        sideMenuElement.style.top = sideMenuState.referencePos.top + 'px';
+        sideMenuElement.style.left =
+          sideMenuState.referencePos.x - sideMenuElement.offsetWidth + 'px';
       } else {
-        element.style.display = 'none';
+        sideMenuElement.style.display = 'none';
       }
     });
 
-    let formattingToolbarElement: HTMLElement | null = null;
-
-    // <-------------formattingToolbar --------------------->
+    // Initialize formattingToolbar
     editor.formattingToolbar.onUpdate((formattingToolbarState) => {
       if (!formattingToolbarElement) {
         formattingToolbarElement = document.createElement('div');
-        formattingToolbarElement.style.background = 'lightgray';
+        formattingToolbarElement.style.background = 'gray';
         formattingToolbarElement.style.position = 'absolute';
-        formattingToolbarElement.style.top = '';
+        formattingToolbarElement.style.top = '50px';
         formattingToolbarElement.style.padding = '5px';
         formattingToolbarElement.style.opacity = '0.8';
 
-        // Add buttons for different formatting options
+        // Add buttons for formatting options
+        //bold
         const boldBtn = this.createButton('B', () => {
-          this.editor.formattingToolbar.toggleBold();
+          editor.toggleStyles({ bold: true });
         });
         formattingToolbarElement.appendChild(boldBtn);
-
+        // italic
         const italicBtn = this.createButton('I', () => {
-          editor.formattingToolbar.toggleItalic();
+          editor.toggleStyles({ italic: true });
         });
         formattingToolbarElement.appendChild(italicBtn);
-
+        // underline
         const underlineBtn = this.createButton('U', () => {
-          editor.formattingToolbar.toggleUnderline();
+          editor.toggleStyles({ underline: true });
         });
         formattingToolbarElement.appendChild(underlineBtn);
-
-        // Add more buttons for other formatting options as needed
+        // strike through
+        const strikethroughBtn = this.createButton('S', () => {
+          editor.toggleStyles({ strike: true });
+        });
+        formattingToolbarElement.appendChild(strikethroughBtn);
+        // strike through
+        const changeColorBtn = this.createButton('Color', () => {
+          // editor.toggleStyles({ backgroundColor: 'blue'});
+          const selectedBlock = editor.getSelection();
+          selectedBlock.blocks[0].props.backgroundColor = 'yellow';
+          // selectedBlock.blocks[0].props.textAlignment = 'right';
+          // selectedBlock.blocks[0].content[0].styles.color = 'blue';
+          // console.log(selectedBlock);
+          console.log(selectedBlock.blocks[0].props.backgroundColor);
+          console.log(editor.getActiveStyles());
+          // console.log(editor.getSelectedText());
+        });
+        formattingToolbarElement.appendChild(changeColorBtn);
 
         document.getElementById('root')!.appendChild(formattingToolbarElement);
       }
 
       if (formattingToolbarState.show) {
         formattingToolbarElement.style.display = 'block';
-        formattingToolbarElement.style.top =
-          formattingToolbarState.referencePos.top + 'px';
         formattingToolbarElement.style.left =
-          formattingToolbarState.referencePos.x + 'px'; // Adjust positioning as necessary
+          formattingToolbarState.referencePos.x + 'px';
       } else {
         formattingToolbarElement.style.display = 'none';
       }
