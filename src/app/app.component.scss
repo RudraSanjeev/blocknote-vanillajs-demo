@@ -1,18 +1,33 @@
-.editor {
-  // border: 1px solid #ccc;
-  width: 60%;
-  margin: auto;
-  background: #000;
-  color: #fff;
-  padding: 10px 10px 10px 70px;
-  outline: none;
-  border-radius: 10px;
-  &:focus {
-    outline: none;
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
   }
   #root {
-    width: 100%;
-    height: 100%;
+    background: #000;
+    color: #fff;
+    border-radius: 5px;
+
+    width: 60%;
     outline: none;
+    margin: auto;
+    padding: 20px 20px 20px 80px;
+
+    .ProseMirror {
+      outline: none;
+      background: yellow;
+    }
   }
 }
+
+// .formattingToolBar {
+//   // font-size: large;
+//   background: #000;
+//   position: absolute;
+//   top: 50px;
+//   padding: 5px;
+//   opacity: 0.8;
+//   border: 1px solid #ccc;
+// }

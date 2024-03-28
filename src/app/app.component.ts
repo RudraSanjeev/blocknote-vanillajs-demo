@@ -16,7 +16,7 @@ type UIElement =
   standalone: true,
   imports: [CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   editor: HTMLElement;
@@ -31,8 +31,14 @@ export class AppComponent {
     const element = document.createElement('a');
     element.href = '#';
     element.text = text;
+    // element.style.border = 'none';
+    // element.style.outline = 'none';
+    // element.style.background = 'transparent';
     element.style.margin = '10px';
     element.style.textDecoration = 'none';
+    element.style.fontSize = '1.8rem';
+    element.style.fontWeight = '600';
+    element.style.color = '#999';
 
     if (onClick) {
       element.addEventListener('click', (e) => {
@@ -57,10 +63,16 @@ export class AppComponent {
     editor.sideMenu.onUpdate((sideMenuState) => {
       if (!sideMenuElement) {
         sideMenuElement = document.createElement('div');
-        sideMenuElement.style.background = 'gray';
+        sideMenuElement.style.background = 'transparent';
+        sideMenuElement.style.width = 'fit-content';
+
+        sideMenuElement.style.display = 'flex';
+        sideMenuElement.style.alignItems = 'center';
+        sideMenuElement.style.justifyContent = 'center';
         sideMenuElement.style.position = 'absolute';
-        // sideMenuElement.style.top = '';
-        sideMenuElement.style.padding = '5px';
+        sideMenuElement.style.top = '40px';
+        sideMenuElement.style.marginTop = '-5px';
+        // sideMenuElement.style.padding = '-5px ';
         sideMenuElement.style.opacity = '0.8';
 
         // Add button for side menu
@@ -94,19 +106,24 @@ export class AppComponent {
     editor.formattingToolbar.onUpdate((formattingToolbarState) => {
       if (!formattingToolbarElement) {
         formattingToolbarElement = document.createElement('div');
-        formattingToolbarElement.style.background = 'gray';
+        formattingToolbarElement.style.background = '#000';
         formattingToolbarElement.style.position = 'absolute';
         formattingToolbarElement.style.top = '50px';
-        formattingToolbarElement.style.padding = '5px';
+        formattingToolbarElement.style.padding = '3px';
         formattingToolbarElement.style.opacity = '0.8';
+        formattingToolbarElement.style.border = '1px solid #ccc';
+        formattingToolbarElement.style.borderRadius = '10px';
+        formattingToolbarElement.style.boxShadow =
+          '1px 0px 8px -1px rgba(0,0,0,0.75);';
 
         // Add buttons for formatting options
         //bold
         const boldBtn = this.createButton('B', () => {
           editor.toggleStyles({ bold: true });
+          console.log(editor.getActiveStyles());
         });
         formattingToolbarElement.appendChild(boldBtn);
-        // italic
+        // italicred
         const italicBtn = this.createButton('I', () => {
           editor.toggleStyles({ italic: true });
         });
@@ -120,23 +137,19 @@ export class AppComponent {
         const strikethroughBtn = this.createButton('S', () => {
           editor.toggleStyles({ strike: true });
         });
-        formattingToolbarElement.appendChild(strikethroughBtn);
-        // strike through
-        // const changeColorBtn = this.createButton('Color', () => {
-        //   editor.toggleStyles({ textColor: 'yellow' });
-        //   console.log(editor.getActiveStyles());
-        //   const inlineContent = document.querySelector('.bn-inline-content');
-        //   if (inlineContent) {
-        //     const spans = inlineContent.querySelectorAll(
-        //       'span[data-text-color]'
-        //     );
-        //     spans.forEach((span: HTMLElement) => {
-        //       span.style.color = 'yellow';
-        //     });
-        //   }
-        // });
-        // formattingToolbarElement.appendChild(changeColorBtn);
 
+        formattingToolbarElement.appendChild(strikethroughBtn);
+        // align left btn
+        const alignLeftBtn = this.createButton('L', () => {
+          editor.getSelection().blocks[0].props.textAlignment = 'center';
+          console.log(editor.getSelection().blocks[0].props);
+        });
+        formattingToolbarElement.appendChild(alignLeftBtn);
+        // // color btn
+        // const colorRedBtn = this.createButton('A', () => {
+        //   editor.toggleStyles({ textColor: 'red' });
+        // });
+        // formattingToolbarElement.appendChild(colorRedBtn);
         document.getElementById('root')!.appendChild(formattingToolbarElement);
       }
 
