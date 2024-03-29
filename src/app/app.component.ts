@@ -19,7 +19,7 @@ type UIElement =
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  editor: HTMLElement;
+  editor: BlockNoteEditor;
 
   uiElement: UIElement = 'linkToolbar';
 
@@ -30,10 +30,8 @@ export class AppComponent {
   createButton(text: string, onClick?: () => void) {
     const element = document.createElement('a');
     element.href = '#';
-    element.text = text;
-    // element.style.border = 'none';
-    // element.style.outline = 'none';
-    // element.style.background = 'transparent';
+    element.innerHTML = text;
+
     element.style.margin = '10px';
     element.style.textDecoration = 'none';
     element.style.fontSize = '1.8rem';
@@ -49,8 +47,44 @@ export class AppComponent {
 
     return element;
   }
+  createSelect(
+    options: { text: string; value: string; propType?: number }[],
+    onChange?: (value: string, propType?: number) => void
+  ) {
+    const element = document.createElement('select');
+    element.style.padding = '3px';
+    element.style.background = 'transparent';
+    element.style.outline = 'none';
+    element.style.fontSize = '1rem';
+    element.style.fontWeight = '600';
+    element.style.color = '#999';
+
+    options.forEach((option) => {
+      const optionElement = document.createElement('option');
+      optionElement.innerHTML = option.text;
+      optionElement.value = option.value;
+      if (option.propType !== undefined) {
+        optionElement.setAttribute('data-propType', option.propType.toString());
+      }
+      element.appendChild(optionElement);
+    });
+
+    if (onChange) {
+      element.addEventListener('change', (event) => {
+        const selectedOption = options.find(
+          (option) => option.value === (event.target as HTMLSelectElement).value
+        );
+        const propType = selectedOption ? selectedOption.propType : undefined;
+        onChange((event.target as HTMLSelectElement).value, propType);
+      });
+    }
+
+    return element;
+  }
+
   initializeEditor() {
     const editor = BlockNoteEditor.create();
+    this.editor = editor;
     editor.mount(document.getElementById('root'));
 
     let sideMenuElement: HTMLElement | null = null;
@@ -116,40 +150,142 @@ export class AppComponent {
         formattingToolbarElement.style.boxShadow =
           '1px 0px 8px -1px rgba(0,0,0,0.75);';
 
+        //  text change para - to heading
+        const changeParaSelect = this.createSelect(
+          [
+            { text: 'T Paragraph', value: 'paragraph' },
+            { text: 'T Heading 3', value: 'heading', propType: 3 },
+            { text: 'T Heading 1', value: 'heading', propType: 1 },
+            { text: 'T Heading 2', value: 'heading', propType: 2 },
+            { text: 'T Bullet list', value: 'bulletListItem' },
+            { text: 'T Number list', value: 'numberedListItem' },
+          ],
+          (
+            value:
+              | 'paragraph'
+              | 'heading'
+              | 'bulletListItem'
+              | 'numberedListItem',
+            propType: 3 | 2 | 1
+          ) => {
+            // console.log(value);
+            const blockToUpdate = editor.getSelection().blocks[0].id;
+
+            // if (value === 'heading') {
+            //   console.log(propType);
+            //   editor.updateBlock(blockToUpdate, {
+            //     type: 'heading',
+            //     props: {
+            //       level: propType,
+            //     },
+            //   });
+            // } else {
+            //   editor.updateBlock(blockToUpdate, { type: value });
+            // }
+            console.log(value);
+            console.log(propType);
+            if (propType !== undefined && propType !== null) {
+              editor.updateBlock(blockToUpdate, {
+                type: 'heading',
+                props: {
+                  level: propType,
+                },
+              });
+            } else {
+              editor.updateBlock(blockToUpdate, { type: value });
+            }
+          }
+        );
+
+        formattingToolbarElement.appendChild(changeParaSelect);
+
         // Add buttons for formatting options
         //bold
-        const boldBtn = this.createButton('B', () => {
-          editor.toggleStyles({ bold: true });
-          console.log(editor.getActiveStyles());
-        });
+        const boldBtn = this.createButton(
+          '<i class="fa-solid fa-bold"></i>',
+          () => {
+            editor.toggleStyles({ bold: true });
+            console.log(editor.getActiveStyles());
+          }
+        );
         formattingToolbarElement.appendChild(boldBtn);
         // italicred
-        const italicBtn = this.createButton('I', () => {
-          editor.toggleStyles({ italic: true });
-        });
+        const italicBtn = this.createButton(
+          '<i class="fa-solid fa-italic"></i>',
+          () => {
+            editor.toggleStyles({ italic: true });
+          }
+        );
         formattingToolbarElement.appendChild(italicBtn);
         // underline
-        const underlineBtn = this.createButton('U', () => {
-          editor.toggleStyles({ underline: true });
-        });
+        const underlineBtn = this.createButton(
+          '<i class="fa-solid fa-underline"></i>',
+          () => {
+            editor.toggleStyles({ underline: true });
+          }
+        );
         formattingToolbarElement.appendChild(underlineBtn);
         // strike through
-        const strikethroughBtn = this.createButton('S', () => {
-          editor.toggleStyles({ strike: true });
-        });
+        const strikethroughBtn = this.createButton(
+          '<i class="fa-solid fa-strikethrough"></i>',
+          () => {
+            editor.toggleStyles({ strike: true });
+          }
+        );
 
         formattingToolbarElement.appendChild(strikethroughBtn);
+
         // align left btn
-        const alignLeftBtn = this.createButton('L', () => {
-          editor.getSelection().blocks[0].props.textAlignment = 'center';
-          console.log(editor.getSelection().blocks[0].props);
-        });
+        const alignLeftBtn = this.createButton(
+          '<i class="fa-solid fa-align-left"></i>',
+          () => {
+            console.log(editor.getSelection().blocks);
+            const blockToUpdate = editor.getSelection().blocks[0].id;
+            editor.updateBlock(blockToUpdate, {
+              props: { textAlignment: 'left' },
+            });
+          }
+        );
         formattingToolbarElement.appendChild(alignLeftBtn);
-        // // color btn
-        // const colorRedBtn = this.createButton('A', () => {
-        //   editor.toggleStyles({ textColor: 'red' });
-        // });
-        // formattingToolbarElement.appendChild(colorRedBtn);
+        // align center btn
+        const alignCenterBtn = this.createButton(
+          '<i class="fa-solid fa-align-center"></i>',
+          () => {
+            console.log(editor.getSelection().blocks);
+            const blockToUpdate = editor.getSelection().blocks[0].id;
+            editor.updateBlock(blockToUpdate, {
+              props: { textAlignment: 'center' },
+            });
+          }
+        );
+        formattingToolbarElement.appendChild(alignCenterBtn);
+        // align right btn
+        const alignRightBtn = this.createButton(
+          '<i class="fa-solid fa-align-right"></i>',
+          () => {
+            console.log(editor.getSelection().blocks);
+            const blockToUpdate = editor.getSelection().blocks[0].id;
+            editor.updateBlock(blockToUpdate, {
+              props: { textAlignment: 'right' },
+            });
+          }
+        );
+        formattingToolbarElement.appendChild(alignRightBtn);
+        // color btns
+        const colorSelect = this.createSelect(
+          [
+            { text: 'A', value: '' },
+            { text: 'A Red', value: 'red' },
+            { text: 'A Green', value: 'green' },
+            { text: 'A Blue', value: 'blue' },
+          ],
+          (value) => {
+            editor.toggleStyles({ textColor: value });
+          }
+        );
+
+        formattingToolbarElement.appendChild(colorSelect);
+
         document.getElementById('root')!.appendChild(formattingToolbarElement);
       }
 
