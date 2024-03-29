@@ -8,7 +8,7 @@ type UIElement =
   | 'linkToolbar'
   | 'imageToolbar'
   | 'sideMenu'
-  | 'suggestionMenu'
+  | 'suggestionMenus'
   | 'tableHandles';
 
 @Component({
@@ -87,13 +87,35 @@ export class AppComponent {
         const span = document.createElement('span');
         span.style.display = 'block';
         span.style.marginTop = '10px';
+        span.style.position = 'absolute';
+        span.style.top = '0';
+        span.style.left = '0';
+        span.style.right = '0';
+        span.style.bottom = '0';
+        span.style.background = 'transparent';
+        span.style.outline = 'none';
+        // span.style.outline = 'none';
+        span.style.transform = 'translate(50%, 15%)';
         const input = document.createElement('input');
+        input.style.background = 'transparent';
+        input.style.color = '#999';
+        input.style.padding = '5px';
+        input.style.fontWeight = '600';
+
+        input.style.outline = 'none';
         input.type = 'text';
         input.placeholder = 'Enter URL and press Enter';
         input.style.width = '200px';
         input.style.marginRight = '10px';
         const button = document.createElement('button');
         button.innerHTML = 'Cancel';
+        button.style.background = 'transparent';
+        button.style.color = '#999';
+        button.style.outline = 'none';
+        button.style.border = '0.5px solid #ccc';
+        button.style.borderRadius = '2px';
+        button.style.padding = '5px';
+
         button.addEventListener('click', () => {
           span.remove();
         });
