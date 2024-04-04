@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { BlockNoteEditor } from '@blocknote/core';
+import {
+  BlockNoteEditor,
+  SuggestionMenuState,
+  suggestionMenuPluginKey,
+} from '@blocknote/core';
+import { SuggestionMenu } from '@blocknote/react';
 
 type UIElement =
   | 'formattingToolbar'
@@ -150,7 +155,7 @@ export class AppComponent {
     options.forEach((option) => {
       const optionElement = document.createElement('option');
       optionElement.innerHTML = option.text;
-      optionElement.style.background = '#000';
+      optionElement.style.background = '#1f1f1f';
       optionElement.style.color = '#999';
       optionElement.style.borderRadius = '15px';
       optionElement.style.fontSize = '0.8rem';
@@ -174,6 +179,90 @@ export class AppComponent {
 
     return element;
   }
+  // createSuggestionMenus(
+  //   options: { text: string; value: string; propType?: number }[],
+  //   onClick?: (value: string, propType?: number) => void
+  // ) {
+  //   const element = document.createElement('div');
+  //   element.style.padding = '3px';
+  //   element.style.background = 'transparent';
+  //   element.style.outline = 'none';
+  //   element.style.border = 'none';
+  //   element.style.fontSize = '1rem';
+  //   element.style.fontWeight = '600';
+  //   element.style.color = '#999';
+
+  //   options.forEach((option) => {
+  //     const optionElement = document.createElement('option');
+  //     optionElement.innerHTML = option.text;
+  //     optionElement.style.background = '#000';
+  //     optionElement.style.color = '#999';
+  //     optionElement.style.borderRadius = '15px';
+  //     optionElement.style.fontSize = '0.8rem';
+
+  //     optionElement.innerText = option.value;
+  //     if (option.propType !== undefined) {
+  //       optionElement.setAttribute('data-propType', option.propType.toString());
+  //     }
+  //     element.appendChild(optionElement);
+  //   });
+
+  //   if (onClick) {
+  //     element.addEventListener('click', (event) => {
+  //       const selectedOption = event.target as HTMLSelectElement;
+  //       const value = selectedOption.innerText;
+  //       const propType =
+  //         selectedOption.selectedOptions[0]?.getAttribute('data-propType');
+  //       onClick(value, propType ? parseInt(propType, 10) : undefined);
+  //     });
+  //   }
+
+  //   return element;
+  // }
+
+  createSuggestionMenus(
+    options: { text: string; value: string; propType?: number }[],
+    onClick?: (value: string, propType?: number) => void
+  ) {
+    const element = document.createElement('div');
+    element.style.display = 'flex';
+    element.style.flexDirection = 'column';
+    element.style.alignItems = 'center';
+    element.style.justifyContent = 'center';
+    element.style.gap = '10px';
+    element.style.padding = '30px';
+    element.style.background = 'transparent';
+    element.style.outline = 'none';
+    element.style.border = 'none';
+    element.style.fontSize = '1rem';
+    element.style.fontWeight = '600';
+    element.style.color = '#999';
+
+    options.forEach((option) => {
+      const optionElement = document.createElement('div');
+      optionElement.innerHTML = option.text;
+      optionElement.style.display = 'flex';
+      optionElement.style.minWidth = '300px';
+      optionElement.style.alignItems = 'center';
+      optionElement.style.justifyContent = 'space-between';
+      optionElement.style.background = '#1f1f1f';
+      optionElement.style.color = '#999';
+      // optionElement.style.borderRadius = '3px';
+      optionElement.style.fontSize = '1.5rem';
+      optionElement.style.cursor = 'pointer';
+      optionElement.style.borderBottom = '0.1px dashed   #ccc';
+      optionElement.style.paddingBottom = '10px';
+
+      optionElement.addEventListener('click', () => {
+        onClick && onClick(option.value, option.propType);
+        // onClick && this.editor.suggestionMenus.closeMenu();
+      });
+
+      element.appendChild(optionElement);
+    });
+
+    return element;
+  }
 
   initializeEditor() {
     const editor = BlockNoteEditor.create();
@@ -186,6 +275,7 @@ export class AppComponent {
     let imageToolbarElement: HTMLElement | null = null;
     let suggestionMenuElement: HTMLElement | null = null;
     let tableHandlesElement: HTMLElement | null = null;
+
     // Initialize sideMenu
     editor.sideMenu.onUpdate((sideMenuState) => {
       if (!sideMenuElement) {
@@ -239,7 +329,7 @@ export class AppComponent {
     editor.formattingToolbar.onUpdate((formattingToolbarState) => {
       if (!formattingToolbarElement) {
         formattingToolbarElement = document.createElement('div');
-        formattingToolbarElement.style.background = '#000';
+        formattingToolbarElement.style.background = '#1f1f1f';
         formattingToolbarElement.style.position = 'absolute';
         formattingToolbarElement.style.top = '50px';
         formattingToolbarElement.style.padding = '0';
@@ -381,7 +471,7 @@ export class AppComponent {
         const setLink = this.createLinkBtn(
           '<i class="fa-solid fa-link"></i>',
           (url) => {
-            console.log(url);
+            // console.log(url);
             const text = editor.getSelectedText();
             editor.createLink(url, text);
           }
@@ -424,10 +514,356 @@ export class AppComponent {
       }
     });
 
-    // editor.suggestionMenus.onUpdate((suggestionMenusState) =>{
-    //   if(!suggestionMenuElement){
+    //  suggestionMenu
+    // editor.suggestionMenus.onUpdate('/', (state: SuggestionMenuState) => {
+    //   console.log('/ is pressed !');
+    //   if (!suggestionMenuElement) {
+    //     console.log('if block execute');
+    //     suggestionMenuElement = document.createElement('div');
+    //     suggestionMenuElement.setAttribute('id', 'suggestionMenuElement');
+    //     console.log(suggestionMenuElement.id);
+    //     suggestionMenuElement.style.background = '#1f1f1f';
+    //     suggestionMenuElement.style.maxWidth = 'fit-content';
+    //     suggestionMenuElement.style.maxHeight = 'fit-content';
+    //     // suggestionMenuElement.style.position = 'absolute';
+    //     suggestionMenuElement.style.position = 'relative';
+    //     suggestionMenuElement.style.top = '0';
+    //     suggestionMenuElement.style.bottom = '0';
+    //     suggestionMenuElement.style.right = '0';
+    //     suggestionMenuElement.style.left = '0';
+    //     // suggestionMenuElement.style.margin = 'auto 10%';
 
+    //     suggestionMenuElement.style.padding = '0';
+    //     suggestionMenuElement.style.border = '0.5px solid #ccc';
+    //     suggestionMenuElement.style.borderRadius = '10px';
+    //     suggestionMenuElement.style.boxShadow =
+    //       '1px 0px 8px -1px rgba(0,0,0,0.75);';
+
+    //     const changeSuggestionElement = this.createSuggestionMenus(
+    //       [
+    //         // { text: 'T Paragraph', value: 'paragraph' },
+    //         // { text: 'T Heading 1', value: 'heading', propType: 1 },
+    //         // { text: 'T Heading 2', value: 'heading', propType: 2 },
+    //         // { text: 'T Heading 3', value: 'heading', propType: 3 },
+    //         // { text: 'T Bullet list', value: 'bulletListItem' },
+    //         // { text: 'T Number list', value: 'numberedListItem' },
+    //         // below code looks like above just for styling.
+    //         {
+    //           text: '<span>H1 </span> <span>Heading 1</span>',
+    //           value: 'heading',
+    //           propType: 1,
+    //         },
+    //         {
+    //           text: ' <span>H2 </span> <span>Heading 2 </span>',
+    //           value: 'heading',
+    //           propType: 2,
+    //         },
+    //         {
+    //           text: '  <span>H3 </span> <span>Heading 3 </span>',
+    //           value: 'heading',
+    //           propType: 3,
+    //         },
+    //         {
+    //           text: '<span><i class="fa-solid fa-t"></i></span> <span>Paragraph</span>',
+    //           value: 'paragraph',
+    //         },
+    //         {
+    //           text: '<span><i class="fa-solid fa-list"></i></span> <span>Bullet list</span> ',
+    //           value: 'bulletListItem',
+    //         },
+    //         {
+    //           text: '<span><i class="fa-solid fa-list-ol"></i></span> <span>Number list</span>  ',
+    //           value: 'numberedListItem',
+    //         },
+    //       ],
+    //       (
+    //         value:
+    //           | 'paragraph'
+    //           | 'heading'
+    //           | 'bulletListItem'
+    //           | 'numberedListItem',
+    //         propType: 3 | 2 | 1
+    //       ) => {
+    //         const allBlockArray = editor.document;
+    //         const len = allBlockArray.length;
+    //         const blockToUpdate = allBlockArray[len - 1];
+    //         // console.log(lastBlock);
+
+    //         // const blockToUpdate = editor.getSelection().blocks[0].id;
+    //         if (propType !== undefined && propType !== null) {
+    //           editor.updateBlock(blockToUpdate, {
+    //             type: 'heading',
+    //             props: {
+    //               level: propType,
+    //             },
+    //           });
+    //         } else {
+    //           editor.updateBlock(blockToUpdate, { type: value });
+    //         }
+    //         console.log('invoked ');
+    //         console.log(state.show);
+    //         // if (state.show) {
+    //         //   suggestionMenuElement.style.display = 'block';
+    //         //   // suggestionMenuElement.style.left = state.referencePos.x + 'px';
+    //         //   // console.log(state);
+    //         // } else {
+    //         //   suggestionMenuElement.style.display = 'none';
+    //         // }
+    //       }
+    //     );
+
+    //     suggestionMenuElement.appendChild(changeSuggestionElement);
+
+    //     document.getElementById('root')!.appendChild(suggestionMenuElement);
+
+    //     console.log(state.show);
+    //     if (state.show) {
+    //       suggestionMenuElement.style.display = 'block';
+    //       suggestionMenuElement.style.left = state.referencePos.x + 'px';
+    //       // console.log(state);
+    //     } else {
+    //       suggestionMenuElement.style.display = 'none';
+    //     }
     //   }
-    // })
+    //   // else {
+    //   //   console.log('else block execute');
+
+    //   //   console.log('already created !');
+    //   //   console.log(state.show);
+    //   //   if (state.show) {
+    //   //     suggestionMenuElement.style.display = 'block';
+    //   //     suggestionMenuElement.style.left = state.referencePos.x + 'px';
+    //   //     // console.log(state);
+    //   //   } else {
+    //   //     suggestionMenuElement.style.display = 'none';
+    //   //   }
+    //   // }
+    // });
+    // editor.suggestionMenus.onUpdate('/', (state: SuggestionMenuState) => {
+    //   console.log('/ is triggered');
+    //   if (!suggestionMenuElement) {
+    //     suggestionMenuElement = document.createElement('div');
+    //     suggestionMenuElement.setAttribute('id', 'suggestionMenuElement');
+    //     suggestionMenuElement.style.background = '#1f1f1f';
+    //     suggestionMenuElement.style.maxWidth = 'fit-content';
+    //     suggestionMenuElement.style.maxHeight = 'fit-content';
+    //     // suggestionMenuElement.style.position = 'absolute';
+    //     suggestionMenuElement.style.position = 'relative';
+    //     suggestionMenuElement.style.top = '0';
+    //     suggestionMenuElement.style.bottom = '0';
+    //     suggestionMenuElement.style.right = '0';
+    //     suggestionMenuElement.style.left = '0';
+    //     // suggestionMenuElement.style.margin = 'auto 10%';
+
+    //     suggestionMenuElement.style.padding = '0';
+    //     suggestionMenuElement.style.border = '0.5px solid #ccc';
+    //     suggestionMenuElement.style.borderRadius = '10px';
+    //     suggestionMenuElement.style.boxShadow =
+    //       '1px 0px 8px -1px rgba(0,0,0,0.75);';
+
+    //     const changeSuggestionElement = this.createSuggestionMenus(
+    //       [
+    //         // { text: 'T Paragraph', value: 'paragraph' },
+    //         // { text: 'T Heading 1', value: 'heading', propType: 1 },
+    //         // { text: 'T Heading 2', value: 'heading', propType: 2 },
+    //         // { text: 'T Heading 3', value: 'heading', propType: 3 },
+    //         // { text: 'T Bullet list', value: 'bulletListItem' },
+    //         // { text: 'T Number list', value: 'numberedListItem' },
+    //         // below code looks like above just for styling.
+    //         {
+    //           text: '<span>H1 </span> <span>Heading 1</span>',
+    //           value: 'heading',
+    //           propType: 1,
+    //         },
+    //         {
+    //           text: ' <span>H2 </span> <span>Heading 2 </span>',
+    //           value: 'heading',
+    //           propType: 2,
+    //         },
+    //         {
+    //           text: '  <span>H3 </span> <span>Heading 3 </span>',
+    //           value: 'heading',
+    //           propType: 3,
+    //         },
+    //         {
+    //           text: '<span><i class="fa-solid fa-t"></i></span> <span>Paragraph</span>',
+    //           value: 'paragraph',
+    //         },
+    //         {
+    //           text: '<span><i class="fa-solid fa-list"></i></span> <span>Bullet list</span> ',
+    //           value: 'bulletListItem',
+    //         },
+    //         {
+    //           text: '<span><i class="fa-solid fa-list-ol"></i></span> <span>Number list</span>  ',
+    //           value: 'numberedListItem',
+    //         },
+    //       ],
+    //       (
+    //         value:
+    //           | 'paragraph'
+    //           | 'heading'
+    //           | 'bulletListItem'
+    //           | 'numberedListItem',
+    //         propType: 3 | 2 | 1
+    //       ) => {
+    //         const allBlockArray = editor.document;
+    //         const len = allBlockArray.length;
+    //         const blockToUpdate = allBlockArray[len - 1];
+    //         // console.log(lastBlock);
+
+    //         // const blockToUpdate = editor.getSelection().blocks[0].id;
+    //         if (propType !== undefined && propType !== null) {
+    //           editor.updateBlock(blockToUpdate, {
+    //             type: 'heading',
+    //             props: {
+    //               level: propType,
+    //             },
+    //           });
+    //         } else {
+    //           editor.updateBlock(blockToUpdate, { type: value });
+    //         }
+    //         console.log('invoked ');
+    //         console.log(state.show);
+    //         // if (state.show) {
+    //         //   suggestionMenuElement.style.display = 'block';
+    //         //   // suggestionMenuElement.style.left = state.referencePos.x + 'px';
+    //         //   // console.log(state);
+    //         // } else {
+    //         //   suggestionMenuElement.style.display = 'none';
+    //         // }
+    //       }
+    //     );
+
+    //     suggestionMenuElement.appendChild(changeSuggestionElement);
+
+    //     document.getElementById('root')!.appendChild(suggestionMenuElement);
+
+    //     console.log('if block state ' + state.show);
+    //     // if (state.show) {
+    //     //   suggestionMenuElement.style.display = 'block';
+    //     //   suggestionMenuElement.style.left = state.referencePos.x + 'px';
+    //     //   // console.log(state);
+    //     // } else {
+    //     //   suggestionMenuElement.style.display = 'none';
+    //     // }
+    //   } else {
+    //     console.log('already created !');
+    //     console.log('if block state ' + state.show);
+
+    //     // if (state.show) {
+    //     //   suggestionMenuElement.style.display = 'block';
+    //     //   suggestionMenuElement.style.left = state.referencePos.x + 'px';
+    //     //   // console.log(state);
+    //     // } else {
+    //     //   suggestionMenuElement.style.display = 'none';
+    //     // }
+    //   }
+    // });
+
+    editor.suggestionMenus.onUpdate('/', (state: SuggestionMenuState) => {
+      console.log('/ is triggered');
+      if (!suggestionMenuElement) {
+        suggestionMenuElement = document.createElement('div');
+        suggestionMenuElement.setAttribute('id', 'suggestionMenuElement');
+        suggestionMenuElement.style.background = '#1f1f1f';
+        suggestionMenuElement.style.maxWidth = 'fit-content';
+        suggestionMenuElement.style.maxHeight = 'fit-content';
+        suggestionMenuElement.style.position = 'relative';
+        suggestionMenuElement.style.top = '0';
+        suggestionMenuElement.style.bottom = '0';
+        suggestionMenuElement.style.right = '0';
+        suggestionMenuElement.style.left = '0';
+        suggestionMenuElement.style.padding = '0';
+        suggestionMenuElement.style.border = '0.5px solid #ccc';
+        suggestionMenuElement.style.borderRadius = '10px';
+        suggestionMenuElement.style.boxShadow =
+          '1px 0px 8px -1px rgba(0,0,0,0.75)';
+
+        const changeSuggestionElement = document.createElement('div');
+        changeSuggestionElement.style.display = 'flex';
+        changeSuggestionElement.style.flexDirection = 'column';
+        changeSuggestionElement.style.alignItems = 'center';
+        changeSuggestionElement.style.justifyContent = 'center';
+        changeSuggestionElement.style.gap = '10px';
+        changeSuggestionElement.style.padding = '30px';
+        changeSuggestionElement.style.background = 'transparent';
+        changeSuggestionElement.style.outline = 'none';
+        changeSuggestionElement.style.border = 'none';
+        changeSuggestionElement.style.fontSize = '1rem';
+        changeSuggestionElement.style.fontWeight = '600';
+        changeSuggestionElement.style.color = '#999';
+
+        const options = [
+          {
+            text: '<span>H1 </span> <span>Heading 1</span>',
+            value: 'heading',
+            propType: 1,
+          },
+          {
+            text: ' <span>H2 </span> <span>Heading 2 </span>',
+            value: 'heading',
+            propType: 2,
+          },
+          {
+            text: '  <span>H3 </span> <span>Heading 3 </span>',
+            value: 'heading',
+            propType: 3,
+          },
+          {
+            text: '<span><i class="fa-solid fa-t"></i></span> <span>Paragraph</span>',
+            value: 'paragraph',
+          },
+          {
+            text: '<span><i class="fa-solid fa-list"></i></span> <span>Bullet list</span> ',
+            value: 'bulletListItem',
+          },
+          {
+            text: '<span><i class="fa-solid fa-list-ol"></i></span> <span>Number list</span>  ',
+            value: 'numberedListItem',
+          },
+        ];
+
+        options.forEach((option: any) => {
+          const optionElement = document.createElement('div');
+          optionElement.innerHTML = option.text;
+          optionElement.style.display = 'flex';
+          optionElement.style.minWidth = '300px';
+          optionElement.style.alignItems = 'center';
+          optionElement.style.justifyContent = 'space-between';
+          optionElement.style.background = '#1f1f1f';
+          optionElement.style.color = '#999';
+          optionElement.style.fontSize = '1.5rem';
+          optionElement.style.cursor = 'pointer';
+          optionElement.style.borderBottom = '0.1px dashed #ccc';
+          optionElement.style.paddingBottom = '10px';
+          optionElement.addEventListener('click', () => {
+            const allBlockArray = editor.document;
+            const len = allBlockArray.length;
+            const blockToUpdate = allBlockArray[len - 1];
+            if (option.propType !== undefined && option.propType !== null) {
+              editor.updateBlock(blockToUpdate, {
+                type: 'heading',
+                props: {
+                  level: option.propType,
+                },
+              });
+            } else {
+              editor.updateBlock(blockToUpdate, { type: option.value });
+            }
+            console.log('invoked ');
+            console.log(state.show);
+          });
+          changeSuggestionElement.appendChild(optionElement);
+        });
+
+        suggestionMenuElement.appendChild(changeSuggestionElement);
+        document.getElementById('root')!.appendChild(suggestionMenuElement);
+      }
+      //  else {
+      //   console.log('already created !');
+      //   // console.log('if block state ' + state.show);
+      //   // suggestionMenuElement.remove();
+      // }
+    });
   }
 }
